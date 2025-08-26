@@ -5,14 +5,13 @@ import org.acme.models.GetArtikelsResponse;
 import org.acme.models.GetIDsResponse;
 import org.acme.models.LoginRequest;
 import org.acme.models.LoginResponse;
+import org.jbpm.bpmn2.core.SequenceFlow;
+import org.jbpm.workflow.core.node.Split;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 @Path("/services")
 @ApplicationScoped
@@ -22,8 +21,6 @@ public class OnlineShop {
 
     @POST
     @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public LoginResponse login() {
         LoginRequest request = new LoginRequest();
         request.setUsername("test@example.de");
@@ -38,8 +35,6 @@ public class OnlineShop {
 
     @POST
     @Path("/get_ids")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public GetIDsResponse ermittleIds() {
         try {
             java.util.List<String> ids = apiClient.handleGetIDs();
@@ -51,12 +46,20 @@ public class OnlineShop {
 
     @POST
     @Path("/get_Artikle")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    // @Consumes(MediaType.APPLICATION_JSON)
+    // @Produces(MediaType.APPLICATION_JSON)
     public GetArtikelsResponse getArtikels() {
-        LoginRequest request = null;
         try {
             java.util.List<Object> artikels = apiClient.getArtikels();
+
+            Split gateway = new Split();
+            gateway.setType(Split.TYPE_XOR); // Exclusive Gateway
+            gateway.setId(24325246);
+            // Connection connection1 = new ConnectionImpl(gateway,
+            // Node.CONNECTION_DEFAULT_TYPE, targetNode, Node.CONNECTION_DEFAULT_TYPE);
+            // gateway.addOutgoingConnection(Node.CONNECTION_DEFAULT_TYPE, connection1);
+
+            SequenceFlow flow1 = new SequenceFlow(null, null, null);
             return new GetArtikelsResponse(true, artikels, "Artikels retrieved successfully");
         } catch (Exception e) {
             return new GetArtikelsResponse(false, null, "Failed to get Artikels: " + e.getMessage());

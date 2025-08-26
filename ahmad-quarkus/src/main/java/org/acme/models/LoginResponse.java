@@ -3,10 +3,12 @@ package org.acme.models;
 public class LoginResponse {
     private String token;
     private boolean success;
+    public String message;
 
-    public LoginResponse(boolean success2, String token2, String string) {
+    public LoginResponse(boolean success2, String token2, String message) {
         this.token = token2;
         this.success = success2;
+        this.message = message;
     }
 
     // Getter und Setter
